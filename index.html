@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseMatrix - Command Hub</title>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #0d1b2a 0%, #050a12 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --neon-cyan: #00f2fe;
+            --neon-blue: #4facfe;
+            --neon-magenta: #ff007f;
+            --neon-purple: #7928ca;
+            --text-main: #ffffff;
+            --text-muted: #8a99ad;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background glow elements to mimic the screenshot tech environment */
+        .ambient-glow-1 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05) 0%, transparent 70%);
+            top: -10%;
+            left: -10%;
+            z-index: 0;
+        }
+
+        .ambient-glow-2 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.04) 0%, transparent 70%);
+            bottom: -10%;
+            right: -10%;
+            z-index: 0;
+        }
+
+        /* Main Dashboard Container */
+        .dashboard-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1280px;
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Top Header Navigation */
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 15px;
+        }
+
+        .brand-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Header Intro Text */
+        .header-intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-intro h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .header-intro p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* 4-Column Grid Architecture */
+        .grid-channels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        /* Individual Feature Cards */
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Active highlight for the core feature, just like the screenshot */
+        .card.active {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+            background: rgba(0, 242, 254, 0.02);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            color: #f1f5f9;
+        }
+
+        /* Inputs, Dropdowns, and UI elements inside cards */
+        .card-input, .card-select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .card-input:focus, .card-select:focus {
+            border-color: var(--neon-blue);
+        }
+
+        .card-select option {
+            background: #0d1b2a;
+            color: #fff;
+        }
+
+        .mock-dashboard-preview {
+            width: 100%;
+            height: 110px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Card-Specific Action Buttons */
+        .card-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: auto;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .card-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        /* Color profiles based on the screenshot accents */
+        .btn-cyan { background: linear-gradient(90deg, #00c6ff, #0072ff); }
+        .btn-magenta { background: linear-gradient(90deg, #f857a6, #ff5858); }
+        .btn-purple { background: linear-gradient(90deg, #7928ca, #b800ff); }
+
+        /* Bottom Action Panel */
+        .action-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-status {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .proceed-btn {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-main);
+            padding: 16px 80px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        .proceed-btn:hover {
+            background: #ffffff;
+            color: #050a12;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="dashboard-container">
+        
+        <!-- Navigation Header -->
+        <header class="header-nav">
+            <!-- Replace this placeholder text with your PulseMatrix logo markup later! -->
+            <div class="brand-logo" id="brandLogo">PulseMatrix</div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Command Hub v1.0</div>
+        </header>
+
+        <!-- Dynamic Header Message -->
+        <section class="header-intro">
+            <h1>Instant Generation & Dashboard Access</h1>
+            <p>Welcome to the all-in-one marketing command. What would you like to achieve today?</p>
+        </section>
+
+        <!-- Interactive Dashboard Options -->
+        <main class="grid-channels">
+            
+            <!-- Column 1: Quick Ad Script Gen -->
+            <div class="card">
+                <div class="card-icon">📝</div>
+                <h2>Quick Ad Script Gen</h2>
+                <input type="text" class="card-input" placeholder="Enter Campaign Topic..." />
+                <select class="card-select">
+                    <option>Meta Ads</option>
+                    <option>Google Ads</option>
+                    <option>TikTok Ads</option>
+                </select>
+                <button class="card-btn btn-cyan">Generate Script</button>
+            </div>
+
+            <!-- Column 2: Access Command Hub Dashboard (Active Focus Element) -->
+            <div class="card active">
+                <div class="card-icon">📊</div>
+                <h2>Access Command Hub Dashboard</h2>
+                <div class="mock-dashboard-preview">
+                    [ Analytics Live Feed ]
+                </div>
+                <button class="card-btn btn-cyan" style="margin-top: 13px;">View Dashboard</button>
+            </div>
+
+            <!-- Column 3: Craft Stopping Hooks -->
+            <div class="card">
+                <div class="card-icon">📢</div>
+                <h2>Craft Stopping Hooks</h2>
+                <select class="card-select">
+                    <option>Instagram Reel</option>
+                    <option>YouTube Short</option>
+                </select>
+                <select class="card-select">
+                    <option>TikTok Viral</option>
+                    <option>Professional</option>
+                </select>
+                <button class="card-btn btn-magenta">Generate Hook</button>
+            </div>
+
+            <!-- Column 4: Generate Visual Creatives -->
+            <div class="card">
+                <div class="card-icon">🎨</div>
+                <h2>Generate Visual Creatives</h2>
+                <select class="card-select">
+                    <option>Meta Feed Post</option>
+                    <option>X / Twitter Image</option>
+                </select>
+                <select class="card-select">
+                    <option>YouTube Thumbnail</option>
+                    <option>Pinterest Pin</option>
+                </select>
+                <button class="card-btn btn-purple">Generate Visual</button>
+            </div>
+
+        </main>
+
+        <!-- Final Execution Footer -->
+        <footer class="action-footer">
+            <div class="footer-status">⚡ Select a specific platform to tailor your output.</div>
+            <button class="proceed-btn">Proceed</button>
+        </footer>
+
+    </div>
+
+</body>
+</html>
