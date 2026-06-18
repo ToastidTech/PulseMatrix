@@ -110,7 +110,7 @@
             font-size: 1rem;
         }
 
-        /* 4-Column Grid Architecture */
+        /* 4-Column Grid Architecture optimized for 6 elements layout scales */
         .grid-channels {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -153,6 +153,7 @@
             min-height: 44px;
             display: flex;
             align-items: center;
+            justify-content: center;
             color: #f1f5f9;
         }
 
@@ -264,23 +265,21 @@
 
     <div class="dashboard-container">
         
-        <!-- Navigation Header -->
         <header class="header-nav">
-            <!-- Replace this placeholder text with your PulseMatrix logo markup later! -->
-            <div class="brand-logo" id="brandLogo">PulseMatrix</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="logo.png" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;" alt="Logo">
+                <div class="brand-logo" id="brandLogo">PulseMatrix</div>
+            </div>
             <div style="color: var(--text-muted); font-size: 0.9rem;">Command Hub v1.0</div>
         </header>
 
-        <!-- Dynamic Header Message -->
         <section class="header-intro">
             <h1>Instant Generation & Dashboard Access</h1>
             <p>Welcome to the all-in-one marketing command. What would you like to achieve today?</p>
         </section>
 
-        <!-- Interactive Dashboard Options -->
         <main class="grid-channels">
             
-            <!-- Column 1: Quick Ad Script Gen -->
             <div class="card">
                 <div class="card-icon">📝</div>
                 <h2>Quick Ad Script Gen</h2>
@@ -293,7 +292,6 @@
                 <button class="card-btn btn-cyan">Generate Script</button>
             </div>
 
-            <!-- Column 2: Access Command Hub Dashboard (Active Focus Element) -->
             <div class="card active">
                 <div class="card-icon">📊</div>
                 <h2>Access Command Hub Dashboard</h2>
@@ -303,7 +301,6 @@
                 <button class="card-btn btn-cyan" style="margin-top: 13px;">View Dashboard</button>
             </div>
 
-            <!-- Column 3: Craft Stopping Hooks -->
             <div class="card">
                 <div class="card-icon">📢</div>
                 <h2>Craft Stopping Hooks</h2>
@@ -318,7 +315,6 @@
                 <button class="card-btn btn-magenta">Generate Hook</button>
             </div>
 
-            <!-- Column 4: Generate Visual Creatives -->
             <div class="card">
                 <div class="card-icon">🎨</div>
                 <h2>Generate Visual Creatives</h2>
@@ -331,38 +327,34 @@
                     <option>Pinterest Pin</option>
                 </select>
                 <button class="card-btn btn-purple">Generate Visual</button>
+            </div>
          
-            <!-- Column 5: Smart Content Calendar -->
-<div class="card">
-    <div class="card-icon">📅</div>
-    <h2>Smart Content Calendar</h2>
-    <input type="text" class="card-input" placeholder="Enter Core Theme/Product...">
-    <select class="card-select">
-        <option>7-Day Multi-Platform Matrix</option>
-        <option>X / Twitter Thread Series</option>
-        <option>LinkedIn Thought Leadership</option>
-    </select>
-    <button class="card-btn btn-teal" style="background: linear-gradient(135deg, #00b4db, #0083b0); color: white;">Build Schedule</button>
-</div>
+            <div class="card">
+                <div class="card-icon">📅</div>
+                <h2>Smart Content Calendar</h2>
+                <input type="text" class="card-input" placeholder="Enter Core Theme/Product...">
+                <select class="card-select">
+                    <option>7-Day Multi-Platform Matrix</option>
+                    <option>X / Twitter Thread Series</option>
+                    <option>LinkedIn Thought Leadership</option>
+                </select>
+                <button class="card-btn" style="background: linear-gradient(135deg, #00b4db, #0083b0); color: white;">Build Schedule</button>
+            </div>
 
-<!-- Column 6: AI Competitor Matrix -->
-<div class="card">
-    <div class="card-icon">🛡️</div>
-    <h2>AI Competitor Matrix</h2>
-    <input type="text" class="card-input" placeholder="Enter Competitor Brand/URL...">
-    <select class="card-select">
-        <option>Counter-Angle Strategy</option>
-        <option>Market Gap Analysis</option>
-        <option>Hook Differentiation</option>
-    </select>
-    <button class="card-btn btn-amber" style="background: linear-gradient(135px, #f12711, #f5af19); color: white;">Generate Counter-Angle</button>
-</div>
-
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <h2>AI Competitor Matrix</h2>
+                <input type="text" class="card-input" placeholder="Enter Competitor Brand/URL...">
+                <select class="card-select">
+                    <option>Counter-Angle Strategy</option>
+                    <option>Market Gap Analysis</option>
+                    <option>Hook Differentiation</option>
+                </select>
+                <button class="card-btn" style="background: linear-gradient(135deg, #f12711, #f5af19); color: white;">Generate Counter-Angle</button>
             </div>
 
         </main>
 
-        <!-- Final Execution Footer -->
         <footer class="action-footer">
             <div class="footer-status">⚡ Select a specific platform to tailor your output.</div>
             <button class="proceed-btn">Proceed</button>
@@ -370,5 +362,46 @@
 
     </div>
 
+    <script>
+        // 1. Service Worker Activation System
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PulseMatrix Service Worker Registered!', reg))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
+
+        // 2. Interactive Click Capture Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardButtons = document.querySelectorAll('.card-btn');
+            
+            cardButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const card = e.target.closest('.card');
+                    const cardTitle = card.querySelector('h2').innerText;
+                    
+                    const input = card.querySelector('.card-input');
+                    const selects = card.querySelectorAll('.card-select');
+                    
+                    let details = '';
+                    if (input && input.value) details += `\nInput Parameter: "${input.value}"`;
+                    
+                    selects.forEach((select, index) => {
+                        details += `\nSelected Selection ${index + 1}: ${select.value}`;
+                    });
+                    
+                    alert(`⚡ Connecting to PulseMatrix Engine...\n\nRunning: ${cardTitle}${details}`);
+                });
+            });
+
+            const proceedBtn = document.querySelector('.proceed-btn');
+            if (proceedBtn) {
+                proceedBtn.addEventListener('click', () => {
+                    alert('🚀 Initializing main Command Hub dashboard metrics stream...');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
