@@ -2,13 +2,29 @@
 
 PulseMatrix is currently a functional marketing command-hub prototype. This roadmap tracks the work required to move it toward a production-ready Toastid Tech product without breaking the existing working flows.
 
+## Architecture decision: TRUE BYOK
+
+PulseMatrix is a customer-owned-provider-credential application.
+
+- PulseMatrix will **not** receive or ship with a Toastid Tech Anthropic API key.
+- No Anthropic provider secret belongs in GitHub, AWS Parameter Store, deployment environment variables, or the application bundle.
+- Customers supply their own Anthropic credential.
+- Anthropic usage and provider billing remain associated with the customer's credential/account.
+- Any future Toastid Cloud relay must forward the customer's BYOK credential transiently and must never substitute a Toastid-owned Anthropic credential.
+- Customer credentials must never be written to application logs, analytics, source control, or persistent server-side storage.
+- Existing BYOK behavior must remain functional while production hardening is performed.
+
 ## Phase 1: Harden the BYOK architecture
 
-- [ ] Move Anthropic requests behind a controlled backend/API route.
-- [ ] Keep customer BYOK support so Toastid Cloud can remain the long-term routing layer.
-- [ ] Remove direct browser-side dependency on Anthropic's browser-access header.
+- [ ] Define the provider request contract independently from the UI.
+- [ ] Choose and implement a controlled API/relay path that preserves true customer BYOK semantics.
+- [ ] Remove the production dependency on Anthropic's direct-browser-access header when the controlled path is ready.
+- [ ] Ensure customer credentials are handled transiently and are never persisted server-side.
 - [ ] Add request validation, bounded inputs, error normalization, and rate limiting.
-- [ ] Never persist provider secrets outside the customer's intended local/secure storage path.
+- [ ] Add explicit credential lifecycle controls in the UI.
+- [ ] Add tests proving no server-owned Anthropic key is required.
+
+**Important:** A backend relay is only acceptable if it uses the customer's supplied credential for that request. It must not become a centrally billed Anthropic service.
 
 ## Phase 2: Replace mock dashboard behavior
 
