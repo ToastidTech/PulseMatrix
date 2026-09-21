@@ -619,6 +619,11 @@
                 <button class="card-btn btn-cyan" id="payNowBtn" style="width:100%;">Complete Purchase — $9.99</button>
                 <button id="alreadyPaidBtn" style="background:none;border:none;color:var(--neon-blue);font-size:0.85rem;margin-top:10px;cursor:pointer;text-decoration:underline;">Already purchased? Enter your PayPal email above and tap here to unlock</button>
                 <p id="verifyMsg" style="font-size:0.8rem;margin-top:8px;min-height:1.2em;"></p>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);">
+                    <input type="text" class="paywall-input" id="promoCode" placeholder="Have a promo code? Enter it here">
+                    <button id="promoBtn" style="background:none;border:1px solid var(--neon-blue);color:var(--neon-blue);font-size:0.85rem;margin-top:10px;padding:8px 18px;border-radius:8px;cursor:pointer;">Confirm promo code</button>
+                    <p id="promoMsg" style="font-size:0.8rem;margin-top:8px;min-height:1.2em;"></p>
+                </div>
             </div>
             <div class="paywall-fine">🎯 No subscription, no recurring charges. API usage runs on your own Anthropic key.</div>
         </div>
@@ -684,6 +689,42 @@
                 } else {
                     msg.style.color = '#ff6b6b';
                     msg.textContent = 'Verification hit a snag — try again in a moment.';
+                }
+            } catch (e) {
+                msg.style.color = '#ff6b6b';
+                msg.textContent = 'Could not reach the verification server — check your connection.';
+            }
+        });
+
+        document.getElementById('promoBtn').addEventListener('click', async () => {
+            const code = document.getElementById('promoCode').value.trim();
+            const msg = document.getElementById('promoMsg');
+            if (!code) {
+                msg.style.color = '#ff6b6b';
+                msg.textContent = 'Enter your promo code first.';
+                return;
+            }
+            msg.style.color = 'var(--text-muted)';
+            msg.textContent = 'Checking code…';
+            try {
+                const resp = await fetch('https://bitefact.toastidtech.com/api/pulsematrix-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await resp.json().catch(() => ({}));
+                if (resp.ok && data.paid) {
+                    localStorage.setItem('pulsematrix_paid', 'true');
+                    localStorage.setItem('pulsematrix_buyer', JSON.stringify({
+                        name: document.getElementById('buyerName').value.trim(),
+                        promo: true,
+                        date: new Date().toISOString()
+                    }));
+                    paywallOverlay.style.display = 'none';
+                    alert('🎉 Promo code accepted! Your copy is unlocked.');
+                } else {
+                    msg.style.color = '#ff6b6b';
+                    msg.textContent = "That code didn't work — check it and try again.";
                 }
             } catch (e) {
                 msg.style.color = '#ff6b6b';
