@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pulsematrix-v1';
+const CACHE_NAME = 'pulsematrix-v2';
 const ASSETS = [
   './',
   './index.html',

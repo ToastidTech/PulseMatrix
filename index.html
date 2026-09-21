@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PulseMatrix — the all-in-one AI marketing command hub. Generate ad scripts, scroll-stopping hooks, visual creatives, content calendars, and competitor counter-angles. Bring your own Anthropic API key; your key never leaves your browser.">
+    <meta name="theme-color" content="#050a12">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo-192.png">
+    <meta property="og:title" content="PulseMatrix — AI Marketing Command Hub">
+    <meta property="og:description" content="Six AI marketing tools in one command hub. Bring your own Anthropic API key — no subscription, no paywall.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="pulsematrix-logo-full.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PulseMatrix — AI Marketing Command Hub">
+    <meta name="twitter:description" content="Six AI marketing tools in one command hub. Bring your own Anthropic API key — no subscription, no paywall.">
     <title>PulseMatrix - Command Hub</title>
     <style>
         :root {
@@ -623,7 +635,7 @@
                                 'anthropic-dangerous-direct-browser-access': 'true' // Activates client side browser bypass
                             },
                             body: JSON.stringify({
-                                model: "claude-3-5-sonnet-20240620",
+                                model: "claude-sonnet-4-6",
                                 max_tokens: 1500,
                                 system: systemInstructions,
                                 messages: [
