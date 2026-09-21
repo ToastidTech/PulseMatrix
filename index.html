@@ -484,8 +484,6 @@
         #paypal-button-container { margin-top: 8px; }
         .paywall-fine { font-size: 0.75rem; color: var(--text-muted); margin-top: 14px; }
     </style>
-    <!-- PayPal JS SDK: replace YOUR_PAYPAL_CLIENT_ID with Sean's Business client ID -->
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
 </head>
 <body>
 
@@ -617,7 +615,10 @@
             <div class="paywall-price-sub">founding members price · one-time · yours forever</div>
             <input type="text" class="paywall-input" id="buyerName" placeholder="Your name">
             <input type="email" class="paywall-input" id="buyerEmail" placeholder="Email for your receipt">
-            <div id="paypal-button-container"></div>
+            <div id="paypal-button-container">
+                <button class="card-btn btn-cyan" id="payNowBtn" style="width:100%;">Complete Purchase — $9.99</button>
+                <button id="alreadyPaidBtn" style="background:none;border:none;color:var(--neon-blue);font-size:0.85rem;margin-top:10px;cursor:pointer;text-decoration:underline;">I've completed my purchase — unlock my copy</button>
+            </div>
             <div class="paywall-fine">🎯 No subscription, no recurring charges. API usage runs on your own Anthropic key.</div>
         </div>
     </div>
@@ -638,40 +639,27 @@
     </div>
 
     <script>
-        // 0. One-time purchase gate ($9.99, yours forever)
+        // 0. One-time purchase gate ($9.99, yours forever) — PayPal payment link
+        const PAYPAL_LINK = 'https://www.paypal.com/ncp/payment/M7U2KX33TVPME';
         const paywallOverlay = document.getElementById('paywallOverlay');
         if (!localStorage.getItem('pulsematrix_paid')) {
             paywallOverlay.style.display = 'flex';
         }
 
-        if (window.paypal) {
-            paypal.Buttons({
-                createOrder: function (data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{ amount: { value: '9.99' }, description: 'PulseMatrix — lifetime access' }]
-                    });
-                },
-                onApprove: function (data, actions) {
-                    return actions.order.capture().then(function (details) {
-                        localStorage.setItem('pulsematrix_paid', 'true');
-                        localStorage.setItem('pulsematrix_buyer', JSON.stringify({
-                            name: document.getElementById('buyerName').value.trim(),
-                            email: document.getElementById('buyerEmail').value.trim(),
-                            orderId: details.id,
-                            date: new Date().toISOString()
-                        }));
-                        paywallOverlay.style.display = 'none';
-                        alert('🎉 Welcome to PulseMatrix! Your copy is unlocked forever.');
-                    });
-                },
-                onError: function (err) {
-                    alert('⚠️ PayPal checkout hit a snag. Please try again.');
-                }
-            }).render('#paypal-button-container');
-        } else {
-            document.getElementById('paypal-button-container').innerHTML =
-                '<p style="color:var(--text-muted);font-size:0.85rem;">Checkout is still being wired up — check back shortly.</p>';
-        }
+        document.getElementById('payNowBtn').addEventListener('click', () => {
+            window.open(PAYPAL_LINK, '_blank', 'noopener');
+        });
+
+        document.getElementById('alreadyPaidBtn').addEventListener('click', () => {
+            localStorage.setItem('pulsematrix_paid', 'true');
+            localStorage.setItem('pulsematrix_buyer', JSON.stringify({
+                name: document.getElementById('buyerName').value.trim(),
+                email: document.getElementById('buyerEmail').value.trim(),
+                date: new Date().toISOString()
+            }));
+            paywallOverlay.style.display = 'none';
+            alert('🎉 Welcome to PulseMatrix! Your copy is unlocked forever.');
+        });
 
         // 1. Service Worker Activation System
         if ('serviceWorker' in navigator) {
