@@ -617,7 +617,8 @@
             <input type="email" class="paywall-input" id="buyerEmail" placeholder="Email for your receipt">
             <div id="paypal-button-container">
                 <button class="card-btn btn-cyan" id="payNowBtn" style="width:100%;">Complete Purchase — $9.99</button>
-                <button id="alreadyPaidBtn" style="background:none;border:none;color:var(--neon-blue);font-size:0.85rem;margin-top:10px;cursor:pointer;text-decoration:underline;">I've completed my purchase — unlock my copy</button>
+                <button id="alreadyPaidBtn" style="background:none;border:none;color:var(--neon-blue);font-size:0.85rem;margin-top:10px;cursor:pointer;text-decoration:underline;">Already purchased? Enter your PayPal email above and tap here to unlock</button>
+                <p id="verifyMsg" style="font-size:0.8rem;margin-top:8px;min-height:1.2em;"></p>
             </div>
             <div class="paywall-fine">🎯 No subscription, no recurring charges. API usage runs on your own Anthropic key.</div>
         </div>
@@ -650,15 +651,44 @@
             window.open(PAYPAL_LINK, '_blank', 'noopener');
         });
 
-        document.getElementById('alreadyPaidBtn').addEventListener('click', () => {
-            localStorage.setItem('pulsematrix_paid', 'true');
-            localStorage.setItem('pulsematrix_buyer', JSON.stringify({
-                name: document.getElementById('buyerName').value.trim(),
-                email: document.getElementById('buyerEmail').value.trim(),
-                date: new Date().toISOString()
-            }));
-            paywallOverlay.style.display = 'none';
-            alert('🎉 Welcome to PulseMatrix! Your copy is unlocked forever.');
+        document.getElementById('alreadyPaidBtn').addEventListener('click', async () => {
+            const email = document.getElementById('buyerEmail').value.trim().toLowerCase();
+            const msg = document.getElementById('verifyMsg');
+            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                msg.style.color = '#ff6b6b';
+                msg.textContent = 'Enter the email from your PayPal receipt first.';
+                return;
+            }
+            msg.style.color = 'var(--text-muted)';
+            msg.textContent = 'Checking your purchase…';
+            try {
+                const resp = await fetch('https://bitefact.toastidtech.com/api/pulsematrix-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await resp.json().catch(() => ({}));
+                if (resp.ok && data.paid) {
+                    localStorage.setItem('pulsematrix_paid', 'true');
+                    localStorage.setItem('pulsematrix_buyer', JSON.stringify({
+                        email,
+                        name: document.getElementById('buyerName').value.trim(),
+                        verified: true,
+                        date: new Date().toISOString()
+                    }));
+                    paywallOverlay.style.display = 'none';
+                    alert('🎉 Welcome back! Your copy is unlocked.');
+                } else if (resp.ok) {
+                    msg.style.color = '#ff6b6b';
+                    msg.textContent = "We couldn't find a purchase for that email. Use the email on your PayPal receipt.";
+                } else {
+                    msg.style.color = '#ff6b6b';
+                    msg.textContent = 'Verification hit a snag — try again in a moment.';
+                }
+            } catch (e) {
+                msg.style.color = '#ff6b6b';
+                msg.textContent = 'Could not reach the verification server — check your connection.';
+            }
         });
 
         // 1. Service Worker Activation System
