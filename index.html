@@ -661,6 +661,7 @@
         }
 
         document.getElementById('payNowBtn').addEventListener('click', () => {
+            try { gtag('event', 'begin_checkout', { currency: 'USD', value: 9.99, items: [{ item_name: 'PulseMatrix Lifetime' }] }); } catch (_) {}
             window.open(PAYPAL_LINK, '_blank', 'noopener');
         });
 
@@ -690,6 +691,7 @@
                         date: new Date().toISOString()
                     }));
                     paywallOverlay.style.display = 'none';
+                    try { gtag('event', 'purchase', { currency: 'USD', value: 9.99, transaction_id: 'pulsematrix-' + Date.now(), items: [{ item_name: 'PulseMatrix Lifetime' }] }); } catch (_) {}
                     alert('🎉 Welcome back! Your copy is unlocked.');
                 } else if (resp.ok) {
                     msg.style.color = '#ff6b6b';
