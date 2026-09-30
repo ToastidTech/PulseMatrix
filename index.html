@@ -691,7 +691,7 @@
                         date: new Date().toISOString()
                     }));
                     paywallOverlay.style.display = 'none';
-                    try { gtag('event', 'purchase', { currency: 'USD', value: 9.99, transaction_id: 'pulsematrix-' + Date.now(), items: [{ item_name: 'PulseMatrix Lifetime' }] }); } catch (_) {}
+                    try { gtag('event', 'purchase', { currency: 'USD', value: 9.99, transaction_id: 'pulsematrix-' + Date.now(), items: [{ item_id: 'pulsematrix-lifetime', item_name: 'PulseMatrix Lifetime', price: 9.99, quantity: 1 }] }); } catch (_) {}
                     alert('🎉 Welcome back! Your copy is unlocked.');
                 } else if (resp.ok) {
                     msg.style.color = '#ff6b6b';
